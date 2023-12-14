@@ -126,5 +126,5 @@ app.use('/', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Success!`);
+    console.log(`App running at http://localhost:${PORT}`);
 });
