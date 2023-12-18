@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Bar Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="master">
+        <canvas id="myChart"></canvas>
+        <div id="titles"></div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('http://localhost:8080'); // Assuming your server is running locally
+                const data = await response.json();
+
+                // Store data in variables
+                const viewsData = data.views;
+                const downloadsData = data.downloads;
+                const countriesData = data.topCountriesByViews
+                const titleData = data.topPerformingArticles
+                var labels = data.xlabels;
+                console.log(titleData)
+
+                function mapToFormattedArray(arr) {
+                    return arr.map(dateString => {
+                    const [year, month] = dateString.split('-');
+                    const monthIndex = parseInt(month, 10) - 1; // Month indices start from 0
+                    const dateObj = new Date(year, monthIndex);
+                
+                    // Format the date as 'Mon YYYY'
+                    const formattedDate = new Intl.DateTimeFormat('en-US', {
+                        year: 'numeric',
+                        month: 'short'
+                    }).format(dateObj);
+                
+                    return formattedDate;
+                    });
+                }
+  
+                var labels = mapToFormattedArray(labels);
+
+                let titles = '';
+                for (let i = 0; i < 10; i++) {
+                    titles += `<li>${titleData[i][0]}: ${titleData[i][1]}</li>`;
+                }
+
+                document.getElementById('titles').innerHTML = titles;
+
+
+                // Use the variables to create the chart
+                const ctx = document.getElementById('myChart').getContext('2d');
+
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Views',
+                                data: viewsData,
+                                backgroundColor: 'rgba(0, 154, 68, 0.3)',
+                                borderColor: 'rgba(0, 154, 68 , 1)',
+                                borderWidth: 1,
+                            },
+                            {
+                                label: 'Downloads',
+                                data: downloadsData,
+                                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                borderColor: 'rgba(0, 0, 0, 1)',
+                                borderWidth: 1,
+                            },
+                        ],
+                    },
+                    options: {
+                        scales: {
+                                x: { stacked: false },
+                                y: { stacked: false }
+                            },
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        fetchData();
+    </script>
+</body>
+</html>
