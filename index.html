@@ -9,22 +9,85 @@
 <body>
     <div class="master">
         <canvas id="myChart"></canvas>
-        <div id="titles"></div>
+        <div style="display: flex;">
+            <div id="topPerformingArticles"></div>
+            <div id="topCountriesByViews"></div>
+            <div id="totals"></div>
+        </div>
     </div>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .master {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 975px;
+            max-height: 500px;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #999;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #topPerformingArticles, #topCountriesByViews, #totals {
+            margin: 20px 0;
+        }
+
+        /* Add margin between tables */
+        #topPerformingArticles table,
+        #topCountriesByViews table,
+        #totals table{
+            margin-bottom: 20px;
+        }
+    </style>
 
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('http://localhost:8080'); // Assuming your server is running locally
+                const response = await fetch('http://localhost:8080');
                 const data = await response.json();
 
                 // Store data in variables
                 const viewsData = data.views;
                 const downloadsData = data.downloads;
-                const countriesData = data.topCountriesByViews
+                const topCountriesObject = data.topCountriesByViews
+                const countriesData = Object.entries(topCountriesObject)
                 const titleData = data.topPerformingArticles
+                const totalViews = data.totalViews
+                const totalDownloads = data.totalDownloads
                 var labels = data.xlabels;
-                console.log(titleData)
+                console.log(totalViews, totalDownloads)
 
                 function mapToFormattedArray(arr) {
                     return arr.map(dateString => {
@@ -44,13 +107,60 @@
   
                 var labels = mapToFormattedArray(labels);
 
-                let titles = '';
-                for (let i = 0; i < 10; i++) {
-                    titles += `<li>${titleData[i][0]}: ${titleData[i][1]}</li>`;
-                }
+                const tableRows = [];
+                for (let i = 0; i < 9; i++) {
+                    tableRows.push(`<tr>
+                                        <td>${titleData[i][0]}</td>
+                                        <td>${titleData[i][1]}</td>
+                                    </tr>
+                                `)}
 
-                document.getElementById('titles').innerHTML = titles;
+                const table = `<table>
+                                    <tr>
+                                        <th>Titles</th>
+                                        <th>Views</th>
+                                    </tr>
+                                    ${tableRows.join('')}
+                                </table>`;
 
+                document.getElementById('topPerformingArticles').innerHTML = table;
+
+                const tableRows2 = [];
+                for (let i = 0; i < 9; i++) {
+                    tableRows2.push(`<tr>
+                                        <td>${countriesData[i][0]}</td>
+                                        <td>${countriesData[i][1]}</td>
+                                    </tr>
+                                `)}
+                
+                const table2 = `<table>
+                                    <tr>
+                                        <th>Country</th>
+                                        <th>Views</th>
+                                    </tr>
+                                    ${tableRows2.join('')}
+                                </table>`;
+
+                document.getElementById('topCountriesByViews').innerHTML = table2;
+
+                const tableRow3 = [];
+                
+                const table3 = `<table>
+                                    <tr>
+                                        <th>Total</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Views</td>
+                                        <td>${totalViews}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Downloads</td>
+                                        <td>${totalDownloads}</td>
+                                    </tr>
+                                </table>`;
+
+                document.getElementById('totals').innerHTML = table3;
 
                 // Use the variables to create the chart
                 const ctx = document.getElementById('myChart').getContext('2d');

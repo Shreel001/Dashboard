@@ -17,6 +17,7 @@ const PORT = process.env.PORT;
 let serverCache = null;
 var xlabels = getDate();
 
+/* Authorization header */
 const headers = {
     'Authorization': `Basic ${BASIC_AUTHORIZATION_HEADER}`,
     'Content-Type': 'application/json',
