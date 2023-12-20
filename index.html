@@ -5,72 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Bar Chart</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="master">
+        <h2 id="heading">Total use of items in this community</h2>
+        <div id="totals"></div>
+        <h2 id="heading">Past 6 months overview</h2>
         <canvas id="myChart"></canvas>
-        <div style="display: flex;">
-            <div id="topPerformingArticles"></div>
-            <div id="topCountriesByViews"></div>
-            <div id="totals"></div>
-        </div>
+        <h2 id="heading">Top performing article</h2>
+        <div id="topPerformingArticles"></div>
+        <h2 id="heading">Top Country Views</h2>
+        <div id="topCountriesByViews"></div>
+        <div id="topCountriesByViews"></div>
     </div>
-
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        .master {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        canvas {
-            width: 100%;
-            max-width: 975px;
-            max-height: 500px;
-            height: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #999;
-            color: #fff;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        #topPerformingArticles, #topCountriesByViews, #totals {
-            margin: 20px 0;
-        }
-
-        /* Add margin between tables */
-        #topPerformingArticles table,
-        #topCountriesByViews table,
-        #totals table{
-            margin-bottom: 20px;
-        }
-    </style>
 
     <script>
         async function fetchData() {
@@ -87,7 +35,6 @@
                 const totalViews = data.totalViews
                 const totalDownloads = data.totalDownloads
                 var labels = data.xlabels;
-                console.log(totalViews, totalDownloads)
 
                 function mapToFormattedArray(arr) {
                     return arr.map(dateString => {
@@ -147,15 +94,15 @@
                 
                 const table3 = `<table>
                                     <tr>
-                                        <th>Total</th>
+                                        <th>Totals</th>
                                         <th>Value</th>
                                     </tr>
                                     <tr>
-                                        <td>Views</td>
+                                        <td>Total Page Views</td>
                                         <td>${totalViews}</td>
                                     </tr>
                                     <tr>
-                                        <td>Downloads</td>
+                                        <td>Totoal Page Downloads</td>
                                         <td>${totalDownloads}</td>
                                     </tr>
                                 </table>`;
