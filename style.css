@@ -1,9 +1,10 @@
-
 body {
     font-family: 'Arial', sans-serif;
     margin-inline: 200px;
     background-color: #f4f4f4;
     color: #333;
+    margin: 0 auto;
+    max-width: 980px
 }
 
 .master {

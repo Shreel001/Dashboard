@@ -9,13 +9,25 @@
 </head>
 <body>
     <div class="master">
-        <h2 id="heading">Total use of items in this community</h2>
+        <h2 id="heading">Total views and downloads for Law dept</h2>
         <div id="totals"></div>
-        <h2 id="heading">Past 6 months overview</h2>
+        <h2 id="heading">Past 6 months overview for Law dept</h2>
         <canvas id="myChart"></canvas>
-        <h2 id="heading">Top performing article</h2>
-        <div id="topPerformingArticles"></div>
-        <h2 id="heading">Top Country Views</h2>
+        <h2 id="heading">Top performing articles for Law dept</h2>
+        <div id="topPerformingArticles">
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Views</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data rows will be inserted here dynamically -->
+                </tbody>
+            </table>
+        </div>
+        <h2 id="heading">Top Countries by Views</h2>
         <div id="topCountriesByViews"></div>
         <div id="topCountriesByViews"></div>
     </div>
@@ -31,7 +43,7 @@
                 const downloadsData = data.downloads;
                 const topCountriesObject = data.topCountriesByViews
                 const countriesData = Object.entries(topCountriesObject)
-                const titleData = data.topPerformingArticles
+                const titleData = data.topPerforming
                 const totalViews = data.totalViews
                 const totalDownloads = data.totalDownloads
                 var labels = data.xlabels;
@@ -54,23 +66,25 @@
   
                 var labels = mapToFormattedArray(labels);
 
-                const tableRows = [];
-                for (let i = 0; i < 9; i++) {
-                    tableRows.push(`<tr>
-                                        <td>${titleData[i][0]}</td>
-                                        <td>${titleData[i][1]}</td>
-                                    </tr>
-                                `)}
+                function displayData() {
+                        // Assuming there's only one row in the table body
+                        const tbody = document.getElementById('tableBody')
 
-                const table = `<table>
-                                    <tr>
-                                        <th>Titles</th>
-                                        <th>Views</th>
-                                    </tr>
-                                    ${tableRows.join('')}
-                                </table>`;
+                        titleData.forEach(entry => {
+                            const row = document.createElement('tr');
+                            const titleCell = document.createElement('td');
+                            const viewsCell = document.createElement('td');
 
-                document.getElementById('topPerformingArticles').innerHTML = table;
+                            titleCell.textContent = entry.title;
+                            viewsCell.textContent = entry.views;
+
+                            row.appendChild(titleCell);
+                            row.appendChild(viewsCell);
+
+                            tbody.appendChild(row);
+                        });
+                    }
+                displayData()
 
                 const tableRows2 = [];
                 for (let i = 0; i < 9; i++) {
@@ -98,11 +112,11 @@
                                         <th>Value</th>
                                     </tr>
                                     <tr>
-                                        <td>Total Page Views</td>
+                                        <td>Total Views</td>
                                         <td>${totalViews}</td>
                                     </tr>
                                     <tr>
-                                        <td>Totoal Page Downloads</td>
+                                        <td>Total Downloads</td>
                                         <td>${totalDownloads}</td>
                                     </tr>
                                 </table>`;

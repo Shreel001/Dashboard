@@ -10,9 +10,10 @@ app.use(cors());
 /* Enviroment variables */
 const BASE_URL = process.env.BASE_URL
 const BASIC_AUTHORIZATION_HEADER = process.env.BASIC_AUTHORIZATION_HEADER
+const BEARER_AUTHORIZATION_TOKEN = process.env.BEARER_AUTHORIZATION_TOKEN
 const INSTITUTION_NAME = process.env.INSTITUTION_NAME
 const GROUP_ID = process.env.GROUP_ID
-const PORT = process.env.PORT;
+const PORT = process.env.PORT
 
 let serverCache = null;
 var xlabels = getDate();
@@ -22,6 +23,11 @@ const headers = {
     'Authorization': `Basic ${BASIC_AUTHORIZATION_HEADER}`,
     'Content-Type': 'application/json',
 };
+
+const headers1 = {
+    'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
+    'Content-Type': 'application/json',
+}
 
 /* Function to fetch and cache data */
 const fetchData = async () => {
@@ -39,8 +45,12 @@ const fetchData = async () => {
         fetch(`${BASE_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
         fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
         fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-        fetch(`${BASE_URL}/${INSTITUTION_NAME}/top/views/article`, { headers })
-    ]);
+        fetch(`https://api.figshare.com/v2/articles?page=1&page_size=1000&group=${GROUP_ID}`, 
+        {
+            'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
+            'Content-Type': 'application/json',
+        } )
+    ]); 
 
     const views_json = await response_Views.json();
     const downloads_json = await response_Downloads.json();
@@ -73,43 +83,41 @@ const fetchData = async () => {
     const filteredEntries = entries.filter(([key, value]) => key !== 'Unknown'); // Filtering out the Unknown dataset
     const topTen = filteredEntries.slice(0, 10);
     const topCountriesByViews = Object.fromEntries(topTen); // Top ten countries by number of views
+    
+    responseTitles_json.map(article => ({
+        id: article.id,
+        title: article.title,
+    }))
 
-    /* Top performing articles from institution */
-    const top = await responseTitles_json.top
-    const entriesTitle = Object.entries(top);
-    const sortedEntries = entriesTitle.sort((a, b) => b[1] - a[1]);
+    const promises = responseTitles_json.map(async (element) => {
+        const { id, title } = element;
 
-    /* Constructing object to make parallel requests to make details array */
-    const cache = {};
-    const fetchDetails = async (entry) => {
-        if (cache[entry[0]]) {
-            return { title: cache[entry[0]], value: entry[1] };
+        const response = await fetch(`${BASE_URL}/${INSTITUTION_NAME}/total/views/article/${id}`);
+        
+        if (!response.ok) {
+            console.error(`Failed to fetch data for ID ${id}: ${response.statusText}`);
+            return { title, views: 0 };
         }
 
-    const apiURL = `https://api.figshare.com/v2/articles/${entry[0]}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`;
-    const article_response = await fetch(apiURL);
-    const article_response_json = await article_response.json();
-    const title = article_response_json.title;
+        const responseData = await response.json();
+        const totalViews = responseData.totals;
 
-    /* Caching the result */
-    cache[entry[0]] = title;
+        return { title, views: totalViews };
+    });
 
-    return { title, value: entry[1] };
-    };
+    const results = await Promise.all(promises);
 
-    const detailsPromises = [];
+    results.sort((a, b) => b.views - a.views);
 
-    for (const entry of sortedEntries) {
-        detailsPromises.push(fetchDetails(entry));
-    }
+    const topTenData = results.slice(0, 10);
 
-    const details = await Promise.all(detailsPromises);
+    // // Simplify the structure if needed
+    const topPerforming = topTenData.map(item => ({
+        title: item.title,
+        views: item.views,
+    }));
 
-    /* Combining titles and values */
-    const zipped_array = (a1, a2) => a1.map((x, i) => [x, a2[i]]);
-    const topPerformingArticles = zipped_array(details.map(detail => detail.title), details.map(detail => detail.value));
-
-    var dataToCache = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticles };
+    var dataToCache = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerforming };
 
     serverCache = {
         data: dataToCache,
@@ -117,7 +125,7 @@ const fetchData = async () => {
     };
 
     return dataToCache;
-};
+}
 
 /* Proxy to handle requests */
 app.use('/', async (req, res) => {

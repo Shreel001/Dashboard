@@ -3,7 +3,7 @@ var xlabels
     function getDate(){
         const date = new Date()
         date.setUTCHours(0, 0, 0, 0);
-        const Month = date.getUTCMonth()
+        const Month = date.getUTCMonth()+1
         const Year = date.getUTCFullYear()
 
         var xlabels = []
