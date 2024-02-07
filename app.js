@@ -24,11 +24,6 @@ const headers = {
     'Content-Type': 'application/json',
 };
 
-const headers1 = {
-    'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
-    'Content-Type': 'application/json',
-}
-
 /* Function to fetch and cache data */
 const fetchData = async () => {
 

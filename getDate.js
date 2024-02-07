@@ -25,7 +25,6 @@ var xlabels
                 j--
             }
             xlabels = xlabels.reverse()
-            console.log(xlabels)
         } 
 
         if(Month-1>=6){
