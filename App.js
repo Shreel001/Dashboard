@@ -1,0 +1,31 @@
+const express = require('express');
+const cors = require('cors');
+const { PORT } = require('./utils/env');
+const fetchData = require('./utils/fetchData')
+
+const app = express();
+app.use(express.static('public'));
+app.use(cors());
+
+let serverCache = null;
+
+/* Proxy to handle requests */
+app.use('/', async (req, res) => {
+    /* checking for the cached data on server side */
+    if (serverCache && Date.now() - serverCache.timestamp < 15 * 60 * 1000) {
+        res.json(serverCache.data);
+    } else {
+        try {
+            /* Fetch and cache data */
+            var data = await fetchData();
+            res.json(data);
+        } catch (error) {
+            console.error('Error during API request:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`App running at http://localhost:${PORT}`);
+});
