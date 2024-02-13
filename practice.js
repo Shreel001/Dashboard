@@ -1,7 +1,25 @@
-const dict = {"title":"Answering in Emergency: The Law and Accountability in Canada’s Pandemic Response","views":397}
+const fetchData = require('./utils/fetchData');
+const getGroupIDs = require('./utils/groups');
 
-const keys = Object.keys(dict)
-const values = Object.values(dict)
+const deptwise = async () => {
+    const deptID = await getGroupIDs();
 
-console.log(keys)
-console.log(values)
+    const ID = deptID.slice(100)
+
+    ID.forEach(element => {
+        console.log(element.id)
+        console.log(element.name)
+    });
+
+    // // Use map instead of forEach to map each element to a promise
+    // const promises = deptID.map(element => fetchData(element));
+
+    // // Wait for all promises to resolve
+    // const data = await Promise.all(promises);
+
+    return ID;
+}
+
+deptwise()
+    .then(data => console.log(data))
+    .catch(error => console.error("Error:", error));

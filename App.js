@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { PORT } = require('./utils/env');
-const fetchData = require('./utils/fetchData')
+const deptWiseData = require('./utils/deptWiseData');
 
 const app = express();
 app.use(express.static('public'));
@@ -17,7 +17,11 @@ app.use('/', async (req, res) => {
     } else {
         try {
             /* Fetch and cache data */
-            var data = await fetchData();
+            var data = await deptWiseData();
+            serverCache = {
+                data: data,
+                timestamp: Date.now(),
+            };
             res.json(data);
         } catch (error) {
             console.error('Error during API request:', error);
