@@ -1,25 +1,21 @@
-const fetchData = require('./utils/fetchData');
-const getGroupIDs = require('./utils/groups');
+const getDate = require('./utils/getDate')
+const { BEARER_AUTHORIZATION_TOKEN } = require('./utils/env');
 
-const deptwise = async () => {
-    const deptID = await getGroupIDs();
+/* Fetching array of last 6 months from current date */
+var xlabels = getDate();
 
-    const ID = deptID.slice(100)
+/* Authorization header */
+const headers = {
+    'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
+    'Content-Type': 'application/json',
+} ;
 
-    ID.forEach(element => {
-        console.log(element.id)
-        console.log(element.name)
-    });
+const trial = async () => {
 
-    // // Use map instead of forEach to map each element to a promise
-    // const promises = deptID.map(element => fetchData(element));
+    const data = await fetch(`https://api.figshare.com/v2/articles?page=1&page_size=1000&group=35541`, { headers })
+    const result = await data.json()
 
-    // // Wait for all promises to resolve
-    // const data = await Promise.all(promises);
-
-    return ID;
+    return result
 }
 
-deptwise()
-    .then(data => console.log(data))
-    .catch(error => console.error("Error:", error));
+module.exports = trial;

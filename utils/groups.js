@@ -33,4 +33,7 @@ const getGroupIDs = async () => {
     }
 };
 
+// getGroupIDs()
+//     .then(data => console.log(data))
+
 module.exports = getGroupIDs;

@@ -1,5 +1,5 @@
 const getDate = require('./getDate')
-const { BASE_URL, INSTITUTION_NAME ,BASIC_AUTHORIZATION_HEADER, BEARER_AUTHORIZATION_TOKEN } = require('./env');
+const { STATS_URL, CONTENT_URL, INSTITUTION_NAME ,BASIC_AUTHORIZATION_HEADER, BEARER_AUTHORIZATION_TOKEN, GROUP_ID } = require('./env');
 
 /* Fetching array of last 6 months from current date */
 var xlabels = getDate();
@@ -22,16 +22,12 @@ const fetchData = async (GROUP_ID) => {
             response_total_Downloads,
             response_Titles
         ] = await Promise.all([
-            fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/month/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${BASE_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${BASE_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`https://api.figshare.com/v2/articles?page=1&page_size=1000&group=${GROUP_ID}`, 
-            {
-                'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
-                'Content-Type': 'application/json',
-            } ).catch(() => null)
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&group=${GROUP_ID}`, {'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,'Content-Type': 'application/json'})
         ]); 
     
         const views_json = await response_Views.json();
@@ -65,18 +61,11 @@ const fetchData = async (GROUP_ID) => {
         const filteredByViews = countryNames.filter(([key, value]) => key !== 'Unknown'); // Filtering out the Unknown dataset
         const topTen = filteredByViews.slice(0, 10);
         const topCountriesByViews = Object.fromEntries(topTen); // Top ten countries by number of views
-        
-        
-        /* Top performing articles based on total views */
-        responseTitles_json.map(article => ({
-            id: article.id,
-            title: article.title,
-        }))
-    
+
         const viewsByArticleID = responseTitles_json.map(async (element) => {
-            const { id, title } = element;
+            const { id, title, url_public_html } = element;
     
-            const response = await fetch(`${BASE_URL}/${INSTITUTION_NAME}/total/views/article/${id}`);
+            const response = await fetch(`${STATS_URL}/${INSTITUTION_NAME}/total/views/article/${id}`);
             
             if (!response.ok) {
                 console.error(`Failed to fetch data for ID ${id}: ${response.statusText}`);
@@ -86,7 +75,7 @@ const fetchData = async (GROUP_ID) => {
             const responseData = await response.json();
             const totalViews = responseData.totals;
     
-            return { title, views: totalViews };
+            return { title, hyperlink: url_public_html, views: totalViews };
         });
     
         const results = await Promise.all(viewsByArticleID);
@@ -96,6 +85,7 @@ const fetchData = async (GROUP_ID) => {
         const topPerformingArticle = topTenArticles.map(item => ({
             title: item.title,
             views: item.views,
+            url: item.hyperlink
         }));
     
         var data = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticle };
@@ -105,5 +95,8 @@ const fetchData = async (GROUP_ID) => {
         return null;
     }
 }
+
+// fetchData()
+//     .then(data => console.log(data))
 
 module.exports = fetchData;

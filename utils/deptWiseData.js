@@ -7,21 +7,18 @@ const deptwise = async () => {
     const deptID = await getGroupIDs();
 
     deptID.forEach(element => {
-        Ids.push(element.id)
+        Ids.push({id: element.id, Department: element.name})
     });
 
     // Use map instead of forEach to map each element to a promise
-    const promises = Ids.map(element => fetchData(element));
+    const promises = Ids.map(element => fetchData(element.id));
 
     // Wait for all promises to resolve
     const data = await Promise.all(promises);
 
     const filteredData = data.filter(item => item !== null);
 
-    return filteredData;
+    return {filteredData};
 }
-
-deptwise()
-    .then(data => console.log(data))
 
 module.exports = deptwise;
