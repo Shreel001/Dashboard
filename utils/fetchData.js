@@ -10,6 +10,8 @@ const headers = {
     'Content-Type': 'application/json',
 };
 
+console.log(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`)
+
 /* Function to fetch and cache data */
 const fetchData = async (GROUP_ID) => {
 
@@ -27,7 +29,7 @@ const fetchData = async (GROUP_ID) => {
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&group=${GROUP_ID}`, {'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,'Content-Type': 'application/json'})
+            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&group=${GROUP_ID}`)
         ]); 
     
         const views_json = await response_Views.json();
@@ -96,7 +98,6 @@ const fetchData = async (GROUP_ID) => {
     }
 }
 
-// fetchData()
-//     .then(data => console.log(data))
+
 
 module.exports = fetchData;
