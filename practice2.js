@@ -9,6 +9,7 @@ const headers = {
 
 const data = async () => {
     const response = await trial();
+    console.log(response)
     let temp = [];
 
     await Promise.all(response.map(async element => {
@@ -28,4 +29,3 @@ const data = async () => {
 };
 
 data()
-    .then(data => console.log(data));
