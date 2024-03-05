@@ -9,11 +9,11 @@
 </head>
 <body>
     <div class="master">
-        <h2 id="heading">Total views and downloads for Law dept</h2>
+        <h2 id="heading">Total views and downloads</h2>
         <div id="totals"></div>
-        <h2 id="heading">Past 6 months overview for Law dept</h2>
+        <h2 id="heading">Past 6 months overview</h2>
         <canvas id="myChart"></canvas>
-        <h2 id="heading">Top performing articles for Law dept</h2>
+        <h2 id="heading">Trending Articles</h2>
         <div id="topPerformingArticles">
             <table id="table">
                 <thead>
@@ -27,15 +27,15 @@
         </div>
         <h2 id="heading">Top Countries by Views</h2>
         <div id="topCountriesByViews"></div>
-        <div id="topCountriesByViews"></div>
     </div>
 
     <script>
         async function displayData() {
             try {
-                const response = await fetch('http://localhost:8080');
-                const data = await response.json();
-
+                const response = await fetch('http://localhost:3000');
+                const result = await response.json();
+                const data = result['Psychology (Theses)']
+                console.log(result)
                 // Store data in variables
                 const viewsData = data.views;
                 const downloadsData = data.downloads;
@@ -76,6 +76,8 @@
                         const titleLink = document.createElement('a');
                         titleLink.textContent = entry.title;
                         titleLink.href = entry.url;
+                        titleLink.style.textDecoration = 'none'
+                        titleLink.style.color = 'black'
 
                         titleCell.appendChild(titleLink);
                         viewsCell.textContent = entry.views;
@@ -87,7 +89,6 @@
                     });
                 }
                 displayData();
-
 
                 const tableRows2 = [];
                 for (let i = 0; i < 9; i++) {

@@ -29,7 +29,7 @@ const fetchData = async (GROUP_ID) => {
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
             fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&published_since=${xlabels[0]}-01&group=${GROUP_ID}`)
         ]); 
-    
+
         const views_json = await response_Views.json();
         const downloads_json = await response_Downloads.json();
         const topCountries_json = await response_TopCountries.json();
@@ -97,6 +97,7 @@ const fetchData = async (GROUP_ID) => {
                 title: item.title,
                 views: item.views,
                 url: item.hyperlink,
+                id: item.id,
                 author: authorNames
             };
         }));
