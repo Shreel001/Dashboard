@@ -1,5 +1,5 @@
 const getDate = require('./getDate')
-const { STATS_URL, CONTENT_URL, INSTITUTION_NAME ,BASIC_AUTHORIZATION_HEADER, BEARER_AUTHORIZATION_TOKEN, GROUP_ID } = require('./env');
+const { STATS_URL, CONTENT_URL, INSTITUTION_NAME ,BASIC_AUTHORIZATION_HEADER, BEARER_AUTHORIZATION_TOKEN } = require('./env');
 
 /* Fetching array of last 6 months from current date */
 var xlabels = getDate();
@@ -9,8 +9,6 @@ const headers = {
     'Authorization': `Basic ${BASIC_AUTHORIZATION_HEADER}`,
     'Content-Type': 'application/json',
 };
-
-console.log(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`)
 
 /* Function to fetch and cache data */
 const fetchData = async (GROUP_ID) => {
@@ -77,19 +75,31 @@ const fetchData = async (GROUP_ID) => {
             const responseData = await response.json();
             const totalViews = responseData.totals;
     
-            return { title, hyperlink: url_public_html, views: totalViews };
+            return { id: id, title, hyperlink: url_public_html, views: totalViews };
         });
     
         const results = await Promise.all(viewsByArticleID);
         results.sort((a, b) => b.views - a.views);
         const topTenArticles = results.slice(0, 10);
     
-        const topPerformingArticle = topTenArticles.map(item => ({
-            title: item.title,
-            views: item.views,
-            url: item.hyperlink
+        const topPerformingArticle = await Promise.all(topTenArticles.map(async (item) => {
+            const response = await fetch(`https://api.figshare.com/v2/account/articles/${item.id}/authors`, {
+                headers: {
+                    'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const authors = await response.json();
+            const authorNames = authors.map(author => author.full_name);
+            
+            return {
+                title: item.title,
+                views: item.views,
+                url: item.hyperlink,
+                author: authorNames
+            };
         }));
-    
+        
         var data = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticle };
     
         return data;
@@ -97,7 +107,5 @@ const fetchData = async (GROUP_ID) => {
         return null;
     }
 }
-
-
 
 module.exports = fetchData;
