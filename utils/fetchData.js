@@ -27,7 +27,7 @@ const fetchData = async (GROUP_ID) => {
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
             fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&group=${GROUP_ID}`)
+            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&published_since=${xlabels[0]}-01&group=${GROUP_ID}`)
         ]); 
     
         const views_json = await response_Views.json();
@@ -62,6 +62,7 @@ const fetchData = async (GROUP_ID) => {
         const topTen = filteredByViews.slice(0, 10);
         const topCountriesByViews = Object.fromEntries(topTen); // Top ten countries by number of views
 
+        /* Filtering Articles dataset to get top 10 performing articles with most views */
         const viewsByArticleID = responseTitles_json.map(async (element) => {
             const { id, title, url_public_html } = element;
     

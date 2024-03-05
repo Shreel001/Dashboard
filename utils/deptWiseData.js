@@ -1,24 +1,25 @@
 const fetchData = require('./fetchData');
 const getGroupIDs = require('./groups');
 
-let Ids=[];
-
 const deptwise = async () => {
     const deptID = await getGroupIDs();
+    const Ids = deptID.map(element => ({ id: element.id, Department: element.name }));
 
-    deptID.forEach(element => {
-        Ids.push({id: element.id, Department: element.name})
+    const promises = Ids.map(async element => {
+        const data = await fetchData(element.id);
+        return { data, name: element.Department };
     });
 
-    // Use map instead of forEach to map each element to a promise
-    const promises = Ids.map(element => fetchData(element.id));
+    const resolvedData = await Promise.all(promises);
 
-    // Wait for all promises to resolve
-    const data = await Promise.all(promises);
+    const filteredData = resolvedData.reduce((acc, item) => {
+        if (item.data !== null) {
+            acc[item.name] = item.data;
+        }
+        return acc;
+    }, {});
 
-    const filteredData = data.filter(item => item !== null);
-
-    return {filteredData};
-}
+    return filteredData;
+};
 
 module.exports = deptwise;

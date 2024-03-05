@@ -9,8 +9,7 @@ const headers = {
 
 const getGroupIDs = async () => {
     try {
-        const api = `https://api.figshare.com/v2/account/institution/groups`;
-        const response = await fetch(api, { headers });
+        const response = await fetch(`https://api.figshare.com/v2/account/institution/groups`, { headers });
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
