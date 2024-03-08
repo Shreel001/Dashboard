@@ -9,6 +9,11 @@
 </head>
 <body>
     <div class="master">
+        <div class="dropdown">
+            <div id="heading">Select Department:</div>
+            <label for="departments">Select a department:</label>
+            <select id="departments"></select>
+        </div>
         <h2 id="heading">Total views and downloads</h2>
         <div id="totals"></div>
         <h2 id="heading">Past 6 months overview</h2>
@@ -32,19 +37,40 @@
     <script>
         async function displayData() {
             try {
-                const response = await fetch('http://localhost:3000');
+                const response = await fetch('http://localhost:8080');
                 const result = await response.json();
-                const data = result['Psychology (Theses)']
-                console.log(result)
+
+                // Select the dropdown element
+                const select = document.getElementById('departments');
+
+                // Clear existing options
+                select.innerHTML = '';
+
+                // Populate dropdown with department names and store the selected department
+                const selectedDepartment = 'Aerospace Engineering (Theses)'; // Default selection
+                Object.keys(result).forEach(departmentName => {
+                    const option = document.createElement('option');
+                    option.value = departmentName;
+                    option.textContent = departmentName;
+                    if (departmentName === selectedDepartment) {
+                        option.selected = true; // Mark the default selection
+                    }
+                    select.appendChild(option);
+                });
+
+                // Store data for the selected department
+                const data = result[selectedDepartment];
+
                 // Store data in variables
                 const viewsData = data.views;
                 const downloadsData = data.downloads;
-                const topCountriesObject = data.topCountriesByViews
-                const countriesData = Object.entries(topCountriesObject)
-                const titleData = data.topPerformingArticle
-                const totalViews = data.totalViews
-                const totalDownloads = data.totalDownloads
+                const topCountriesObject = data.topCountriesByViews;
+                const countriesData = Object.entries(topCountriesObject);
+                const titleData = data.topPerformingArticle;
+                const totalViews = data.totalViews;
+                const totalDownloads = data.totalDownloads;
                 var labels = data.xlabels;
+                const ids = data.id;
 
                 function mapToFormattedArray(arr) {
                     return arr.map(dateString => {
@@ -66,7 +92,7 @@
 
                 function displayData() {
                     // Assuming there's only one row in the table body
-                    const tbody = document.getElementById('tableBody')
+                    const tbody = document.getElementById('tableBody');
 
                     titleData.forEach(entry => {
                         const row = document.createElement('tr');
@@ -76,8 +102,8 @@
                         const titleLink = document.createElement('a');
                         titleLink.textContent = entry.title;
                         titleLink.href = entry.url;
-                        titleLink.style.textDecoration = 'none'
-                        titleLink.style.color = 'black'
+                        titleLink.style.textDecoration = 'none';
+                        titleLink.style.color = 'black';
 
                         titleCell.appendChild(titleLink);
                         viewsCell.textContent = entry.views;
@@ -96,7 +122,8 @@
                                         <td>${countriesData[i][0]}</td>
                                         <td>${countriesData[i][1]}</td>
                                     </tr>
-                                `)}
+                                `);
+                }
                 
                 const table2 = `<table>
                                     <tr>

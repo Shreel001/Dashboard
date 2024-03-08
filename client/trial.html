@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Menu</title>
+</head>
+<body>
+    <label for="departments">Select a department:</label>
+    <select id="departments"></select>
+
+    <script>
+        // Assume departmentNames is the array of department names obtained
+        // dynamically from your data source
+        const departmentNames = ['criminology', 'economics'];
+
+        const select = document.getElementById('departments');
+
+        // Create and append an <option> element for each department name
+        departmentNames.forEach(department => {
+            const option = document.createElement('option');
+            option.value = department; // Set the value attribute
+            option.textContent = department; // Set the text content
+            select.appendChild(option); // Append the option to the select element
+        });
+    </script>
+</body>
+</html>
