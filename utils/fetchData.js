@@ -104,11 +104,14 @@ const fetchData = async (GROUP_ID) => {
         }));
 
         const groups = await getGroupIDs()
+        const dropdown = {}
 
         const id = groups.map(element => element.id)
         const department = groups.map(element => element.name)
 
-        var data = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticle, id, department };
+        
+
+        var data = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticle, groups};
     
         return data;
     } catch (error) {

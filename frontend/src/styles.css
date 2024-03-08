@@ -1,0 +1,78 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin-inline: 200px;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0 auto;
+    max-width: 980px
+  }
+  
+  .master {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  canvas {
+    width: 100%;
+    max-width: 975px;
+    max-height: 500px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  #heading {
+    font-size: xx-large;
+    font-family: 'EB Garamond';
+    font-weight: 400;
+    margin: 10px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #999;
+    color: #fff;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  #topPerformingArticles, #topCountriesByViews, #totals {
+    margin: 10px 0;
+  }
+  
+  /* Add margin between tables */
+  #topPerformingArticles table,
+  #topCountriesByViews table{
+    margin-bottom: 20px;
+  }
+  
+  #totals{
+    width: 100%;
+    max-width: 550px;
+  }
+  
+  #topCountriesByViews{
+    width: 100%;
+    max-width: 450px;
+  }
+  
+  #topPerformingArticles{
+    width: 100%;
+    max-width: 950px;
+  }
+
+  #departments{
+    width: 50%;
+  }
