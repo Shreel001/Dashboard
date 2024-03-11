@@ -21,13 +21,15 @@ const fetchData = async (GROUP_ID) => {
             response_TopCountries,
             respose_total_Views,
             response_total_Downloads,
-            response_Titles
+            response_Titles_6,
+            response_Titles_12
         ] = await Promise.all([
-            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${STATS_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
-            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[0]}-01&end_date=${xlabels[5]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/views/group/${GROUP_ID}?start_date=${xlabels[6]}-01&end_date=${xlabels[11]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/month/downloads/group/${GROUP_ID}?start_date=${xlabels[6]}-01&end_date=${xlabels[11]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/breakdown/total/views/group/${GROUP_ID}?start_date=${xlabels[6]}-01&end_date=${xlabels[11]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/views/group/${GROUP_ID}?start_date=${xlabels[6]}-01&end_date=${xlabels[11]}-28`, { headers }),
+            fetch(`${STATS_URL}/${INSTITUTION_NAME}/timeline/year/downloads/group/${GROUP_ID}?start_date=${xlabels[6]}-01&end_date=${xlabels[11]}-28`, { headers }),
+            fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&published_since=${xlabels[6]}-01&group=${GROUP_ID}`),
             fetch(`${CONTENT_URL}/articles?page=1&page_size=1000&published_since=${xlabels[0]}-01&group=${GROUP_ID}`)
         ]); 
 
@@ -36,7 +38,14 @@ const fetchData = async (GROUP_ID) => {
         const topCountries_json = await response_TopCountries.json();
         const totalViews_json = await respose_total_Views.json();
         const totalDownloads_json = await response_total_Downloads.json();
-        const responseTitles_json = await response_Titles.json();
+        // const responseTitles_json = await response_Titles.json();
+
+        let responseTitles_json;
+        if (response_Titles_6.length > 0) {
+            responseTitles_json = await response_Titles_6.json();
+        } else {
+            responseTitles_json = await response_Titles_12.json();
+        }
     
         /* views: Array of views data for past 6 months to display on chart */
         /* downloads: Array of downloads data for past 6 months to display on chart */
@@ -85,7 +94,7 @@ const fetchData = async (GROUP_ID) => {
         const topTenArticles = results.slice(0, 10);
     
         const topPerformingArticle = await Promise.all(topTenArticles.map(async (item) => {
-            const response = await fetch(`https://api.figshare.com/v2/account/articles/${item.id}/authors`, {
+            const response = await fetch(`${CONTENT_URL}/account/articles/${item.id}/authors`, {
                 headers: {
                     'Authorization': `Bearer ${BEARER_AUTHORIZATION_TOKEN}`,
                     'Content-Type': 'application/json'
@@ -104,12 +113,10 @@ const fetchData = async (GROUP_ID) => {
         }));
 
         const groups = await getGroupIDs()
-        const dropdown = {}
 
-        const id = groups.map(element => element.id)
-        const department = groups.map(element => element.name)
-
-        
+        // const dropdown = {}
+        // const id = groups.map(element => element.id)
+        // const department = groups.map(element => element.name)
 
         var data = { views, downloads, xlabels, topCountriesByViews, totalViews, totalDownloads, topPerformingArticle, groups};
     
