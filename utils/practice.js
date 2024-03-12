@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { BEARER_AUTHORIZATION_TOKEN } = require('./env');
+const {BEARER_AUTHORIZATION_TOKEN} = require('./env')
 
 /* Authorization header */
 const headers = {
@@ -26,7 +26,7 @@ const practice = async () => {
             return {
               name : item.name,
               id : item.id,
-              elements: json_response
+              departments: json_response
                   .filter(element => element.parent_id === item.id)
                   .map(element => ({ name: element.name, id: element.id }))
             };
@@ -35,10 +35,19 @@ const practice = async () => {
           }  
         }).filter(item => item !== null);
             
-        return {faculty,departments}
+        return departments
     } catch (error) {
         console.error('Error fetching group IDs:', error);
     }
 };
+
+practice()
+  .then(data => {
+    const faculty = data.map(element => ({
+      name: element.name,
+      departments: element.departments.map(element => element.name)
+    }))
+    console.log(faculty)
+  })
 
 module.exports = practice;

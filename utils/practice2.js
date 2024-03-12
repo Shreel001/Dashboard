@@ -1,7 +1,6 @@
-const  getGroupIDs = require("./groups");
-const fetchData = require('./fetchData');
 const express = require('express');
 const cors = require('cors');
+const practice = require("./practice");
 
 const app = express();
 app.use(express.static('public'));
@@ -10,36 +9,16 @@ app.use(cors());
 const PORT = 5000
 
 const deptwise = async () => {
-    const deptID = await getGroupIDs();
-
+    const deptID = await practice()
     const promises = deptID.map(async element => {
         const faculty = element.name;
         const facultyID = element.id;
-        const deptData = element.departments.map(item => ({ name: item.name, id: item.id }));
-        
-        // Fetch data for each department asynchronously
-        const fetchDataPromises = deptData.map(async department => ({
-            departmentName: department.name,
-            departmentData: await fetchData(department.id)
-        }));
-        
-        // Wait for all the fetchData promises to resolve
-        const fetchedData = await Promise.all(fetchDataPromises);
+        const depts = element.departments
     
-        // Filter out departments with null data
-        const data = fetchedData.filter(department => department.departmentData !== null);
-    
-        return { faculty, facultyID, data };
+        return { faculty, facultyID, depts };
     });
     
     const resolvedData = await Promise.all(promises);
-
-    // const filteredData = resolvedData.reduce((acc, item) => {
-    //     if (item.data !== null) {
-    //         acc[item.name] = item.data;
-    //     }
-    //     return acc;
-    // }, {});
 
     return resolvedData;
 };
@@ -54,4 +33,4 @@ app.listen(PORT, () => {
     console.log(`App running at http://localhost:${PORT}`);
 });
 
-// deptwise().then(data => console.log(data))
+module.exports = deptwise;

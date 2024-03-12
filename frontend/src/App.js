@@ -4,7 +4,9 @@ import './styles.css';
 
 function App() {
   const [resultData, setResultData] = useState(null);
+  const [selectedFaculty, setSelectedFaculty] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [group, setGroup] = useState([]);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -17,12 +19,24 @@ function App() {
         console.error('Error fetching data:', error);
       }
     };
-
     fetchData();
-  }, []);  
+  }, []);
 
   useEffect(() => {
-    if (resultData && selectedDepartment) {
+    const fetchGroup = async () => {
+      try {
+        const response = await fetch('http://localhost:5000');
+        const result = await response.json();
+        setGroup(result);
+      } catch (error) {
+        console.error('Error fetching group data:', error);
+      }
+    };
+    fetchGroup();
+  }, []);
+
+  useEffect(() => {
+    if (resultData && (selectedDepartment || selectedFaculty) ) {
       // Store data for the selected department
       const data = resultData[selectedDepartment];
 
@@ -73,12 +87,6 @@ function App() {
       }
 
       displayData()
-
-      // if (titleData.length > 0) {
-      //   displayData();
-      // } else {
-      //   document.getElementById("topPerformingArticles").style.display = "none";
-      // }
 
       const tableRows2 = [];
 
@@ -153,21 +161,38 @@ function App() {
     }
   }, [resultData, selectedDepartment]);
 
-  const handleSelectChange = (e) => {
+  const handleFacultyChange = (e) => {
+    setSelectedFaculty(e.target.value);
+    setSelectedDepartment('');
+  };
+
+  const handleDepartmentChange = (e) => {
     setSelectedDepartment(e.target.value);
   };
 
   return (
     <div className="master">
-      <div className="dropdown">
-        <div id="heading">Select department</div>
-        <label htmlFor="departments"></label>
-        <select id="departments" value={selectedDepartment} onChange={handleSelectChange}>
-          <option value="">Select an option </option>
-          {resultData && Object.keys(resultData).map((departmentName) => (
-            <option key={departmentName} value={departmentName}>{departmentName}</option>
-          ))}
-        </select>
+      <div className='dropdown-menu'>
+        <div className="dropdown">
+          {/* <h2 id="heading">Select faculty</h2> */}
+          <select id="faculties" value={selectedFaculty} onChange={handleFacultyChange}>
+            <option value="">Select a faculty</option>
+            {group.map(({ faculty }) => (
+              <option key={faculty} value={faculty}>{faculty}</option>
+            ))}
+          </select>
+        </div>
+        {selectedFaculty && (
+          <div className="dropdown">
+            {/* <div id="heading">Select department</div> */}
+            <select id="departments" value={selectedDepartment} onChange={handleDepartmentChange}>
+              <option value="">Select a department</option>
+              {group.find(({ faculty }) => faculty === selectedFaculty)?.depts.map(({ name }) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       <h2 id="heading">Total views and downloads</h2>
       <div id="totals"></div>

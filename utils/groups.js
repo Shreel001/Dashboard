@@ -25,7 +25,7 @@ const getGroupIDs = async () => {
             .filter(article => article.parent_id !== 35349 && article.parent_id !== 0) // Exclude specific parent IDs
             .map(article => ({ name: article.name, id: article.id })); // Extract group IDs
 
-        return department
+        return result
     } catch (error) {
         console.error('Error fetching group IDs:', error);
         return null;
