@@ -16,7 +16,7 @@ function getDate(){
             i++
         }
         xlabels = xlabels.reverse()
-        remELement = (len+1)/2 - xlabels.length
+        remELement = (len+1) - xlabels.length
 
         while(j != len-remELement){
             xlabels.push(`${Year-1}-${months[j]}`)
